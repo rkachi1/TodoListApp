@@ -1,19 +1,25 @@
-import { useState } from "react";
+import { Button, FormControl, Input, InputLabel } from "@material-ui/core";
+import { useState, useEffect } from "react";
 import "./App.css";
+import Todo from "./components/Todos/Todo";
+import db from "./components/Todos/firebase";
 
 function App() {
   // using useStateHook to set a value for the todos
 
-  const [todos, setTodos] = useState([
-    "Take gos for a walk",
-    "Get hired in a company",
-    "Need something in replacement",
-  ]);
+  const [todos, setTodos] = useState([]);
   // using useStateHook to set a value for the input
   const [input, setInput] = useState("");
 
+  //When we actually come on to the page we need to listen to the database and get back the data
+
+  useEffect(() => {
+    db.collection("todos").onSnapshot((snapshot) => console.log(snapshot));
+  }, []);
+
   //Adding a todo function
   const addTodos = (event) => {
+    //this function prevents refreshing of the screen
     event.preventDefault();
     setTodos([...todos, input]);
     setInput("");
@@ -21,23 +27,33 @@ function App() {
   return (
     <div>
       <div className="App">
-        <h1>Hello World</h1>
+        <h1>To Do List App Using React and Firebase</h1>
         <form>
-          <input
-            placeholder="Add todo..."
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-          ></input>
-          <button type="submit" onClick={addTodos}>
+          <FormControl>
+            <InputLabel>Write a Todo</InputLabel>
+            <Input
+              id="standard-basic"
+              label="Add Todo"
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+            />
+          </FormControl>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            onClick={addTodos}
+            disabled={!input}
+          >
             Add Todo
-          </button>
+          </Button>
         </form>
       </div>
       <div className="newClass">
         <ul>
-          {todos.map((todo) => {
-            return <li>{todo}</li>;
-          })}
+          {todos.map((todo) => (
+            <Todo text={todo} />
+          ))}
         </ul>
       </div>
     </div>
