@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import Todo from "./components/Todos/Todo";
 import db from "./components/Todos/firebase";
-
+import firebase from "firebase";
 function App() {
   // using useStateHook to set a value for the todos
 
@@ -14,14 +14,23 @@ function App() {
   //When we actually come on to the page we need to listen to the database and get back the data
 
   useEffect(() => {
-    db.collection("todos").onSnapshot((snapshot) => console.log(snapshot));
+    db.collection("todos")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) =>
+        setTodos(snapshot.docs.map((doc) => doc.data().todo))
+      );
   }, []);
 
   //Adding a todo function
   const addTodos = (event) => {
     //this function prevents refreshing of the screen
     event.preventDefault();
+    db.collection("todos").add({
+      todo: input,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
     setTodos([...todos, input]);
+
     setInput("");
   };
   return (
@@ -39,6 +48,7 @@ function App() {
             />
           </FormControl>
           <Button
+            className="todoButton"
             variant="contained"
             color="primary"
             type="submit"

@@ -1,3 +1,8 @@
 .App {
   text-align: center;
 }
+
+.todoButton {
+  margin-top: 1%;
+  margin-left: 2%;
+}
